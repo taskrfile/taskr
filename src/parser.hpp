@@ -36,13 +36,13 @@ public:
 			bool is_block_line = has_brackets(line);
 
 			if (tasks.size() == 0 && !is_block_line) {
-				log("Invalid taskr.toml file format: line " + (i + 1), ERROR);
+				log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
 				exit(1);
 			}
 
 			if (is_block_line) {
 				if (contains_space(line)) {
-					log("Invalid taskr.toml file format: line " + (i + 1), ERROR);
+					log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
 					exit(1);
 				}
 
