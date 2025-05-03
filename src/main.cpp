@@ -17,7 +17,8 @@ using std::left;
 using std::max;
 
 void show_help() {
-	cout << "Usage: taskr <task_name>\n\n"
+	cout << "Usage:\n"
+	     << "  taskr <task_name>\n\n"
 	     << "Options:\n"
   	     << "  -h, --help      Show this help message and exit\n"
   	     << "  -l, --list      List the available tasks\n";
@@ -29,7 +30,7 @@ void show_tasks(const vector<Task>& tasks) {
 		name_width = max(name_width, task.name.length());
 	}
 
-	cout << "List of available tasks:\n\n";
+	cout << "List of available tasks:\n";
 	cout << left;
 
 	for (const Task& task : tasks) {
