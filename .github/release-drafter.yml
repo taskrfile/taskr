@@ -2,20 +2,11 @@ name-template: 'Release $RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 
 template: |
-
   ## Changelog for $RESOLVED_VERSION
 
-  ### 🚀 New Features
-  $FEATURES
-
-  ### 🐛 Bug Fixes
-  $BUGS
-
-  ### 📚 Documentation
-  $DOCUMENTATION
-
-  ### Other Changes
-  $OTHER_CHANGES
+category-template: |
+  ### $TITLE
+  $CHANGES
 
 changelog:
   exclude:
@@ -23,17 +14,17 @@ changelog:
       - "ignore for release"
 
   categories:
-    - title: FEATURES
+    - title: "🚀 New Features"
       labels:
         - enhancement
 
-    - title: BUGS
+    - title: "🐛 Bugs"
       labels:
         - bug
 
-    - title: DOCUMENTATION
+    - title: "📚 Documentation"
       labels:
         - documentation
 
-    - title: other_changes
+    - title: "Other Changes"
       labels: []
