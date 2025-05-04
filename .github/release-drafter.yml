@@ -1,14 +1,10 @@
-name-template: 'Release $RESOLVED_VERSION'
+name-template: 'Release v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
-
-template: |
-  ## Changelog for $RESOLVED_VERSION
-
-  $CHANGES
 
 changelog:
   exclude:
     labels:
+      - 'ignore for release'
       - 'ignore for release'
 
   categories:
@@ -31,20 +27,7 @@ changelog:
     - title: 'Other Changes'
       labels: []
 
-autolabeler:
-  - label: 'chore'
-    files:
-      - '*.md'
+template: |
+  ## Changelog for v$RESOLVED_VERSION
 
-  - label: 'documentation'
-    files:
-      - 'docs/**'
-
-  - label: 'bug'
-    branch:
-      - '/fix\/.+/'
-
-  - label: 'enhancement'
-    branch:
-      - '/feature\/.+/'
-      - '/feat\/.+/'
+  $CHANGES
