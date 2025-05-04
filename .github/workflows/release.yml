@@ -72,14 +72,15 @@ jobs:
         uses: release-drafter/release-drafter@v6
         with:
           tag: ${{ github.event.inputs.version }}
-          publish: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload assets to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/**/*
-          upload_url: ${{ steps.draft_release.outputs.upload_url }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release assets
+        run: |
+          gh release upload ${{ github.event.inputs.version }} \
+            "artifacts/taskr_${{ github.event.inputs.version }}_linux" \
+            "artifacts/taskr_${{ github.event.inputs.version }}_windows.exe" \
+            "artifacts/taskr_${{ github.event.inputs.version }}_macos" \
+            --clobber
+
+          gh release edit ${{ github.event.inputs.version }} --draft=false

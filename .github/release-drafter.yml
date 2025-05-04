@@ -30,3 +30,21 @@ changelog:
 
     - title: 'Other Changes'
       labels: []
+
+autolabeler:
+  - label: 'chore'
+    files:
+      - '*.md'
+
+  - label: 'documentation'
+    files:
+      - 'docs/**'
+
+  - label: 'bug'
+    branch:
+      - '/fix\/.+/'
+
+  - label: 'enhancement'
+    branch:
+      - '/feature\/.+/'
+      - '/feat\/.+/'
