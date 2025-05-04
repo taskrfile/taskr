@@ -34,11 +34,7 @@ jobs:
       - name: Package binaries
         run: |
           mkdir -p artifacts
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            cp bin/taskr.exe artifacts/
-          else
-            cp bin/taskr artifacts/
-          fi
+          cp bin/taskr* artifacts/
         shell: bash
 
       - name: Upload artifacts
