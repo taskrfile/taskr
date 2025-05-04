@@ -4,27 +4,47 @@ tag-template: 'v$RESOLVED_VERSION'
 template: |
   ## Changelog for $RESOLVED_VERSION
 
-category-template: |
-  ### $TITLE
   $CHANGES
 
 changelog:
   exclude:
     labels:
-      - "ignore for release"
+      - 'ignore for release'
 
   categories:
-    - title: "🚀 New Features"
+    - title: '🚀 New Features'
       labels:
-        - enhancement
+        - 'enhancement'
 
-    - title: "🐛 Bugs"
+    - title: '🐛 Bugs'
       labels:
-        - bug
+        - 'bug'
 
-    - title: "📚 Documentation"
+    - title: '📚 Documentation'
       labels:
-        - documentation
+        - 'documentation'
 
-    - title: "Other Changes"
+    - title: '🔧 Maintenance'
+      labels:
+        - 'chore'
+
+    - title: 'Other Changes'
       labels: []
+
+autolabeler:
+  - label: 'chore'
+    files:
+      - '*.md'
+
+  - label: 'documentation'
+    files:
+      - 'docs/**'
+
+  - label: 'bug'
+    branch:
+      - '/fix\/.+/'
+
+  - label: 'enhancement'
+    branch:
+      - '/feature\/.+/'
+      - '/feat\/.+/'
