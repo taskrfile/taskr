@@ -71,6 +71,7 @@ jobs:
         id: draft_release
         uses: release-drafter/release-drafter@v6
         with:
+          config-name: release-drafter.yml
           tag: ${{ github.event.inputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,3 +85,5 @@ jobs:
             --clobber
 
           gh release edit ${{ github.event.inputs.version }} --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
