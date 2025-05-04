@@ -1,31 +1,28 @@
 name-template: 'Release v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 
-changelog:
-  exclude:
+exclude-labels:
+  - 'ignore for release'
+
+categories:
+  - title: '🚀 New Features'
     labels:
-      - 'ignore for release'
-      - 'ignore for release'
+      - 'enhancement'
 
-  categories:
-    - title: '🚀 New Features'
-      labels:
-        - 'enhancement'
+  - title: '🐛 Bugs'
+    labels:
+      - 'bug'
 
-    - title: '🐛 Bugs'
-      labels:
-        - 'bug'
+  - title: '📚 Documentation'
+    labels:
+      - 'documentation'
 
-    - title: '📚 Documentation'
-      labels:
-        - 'documentation'
+  - title: '🔧 Maintenance'
+    labels:
+      - 'chore'
 
-    - title: '🔧 Maintenance'
-      labels:
-        - 'chore'
-
-    - title: 'Other Changes'
-      labels: []
+  - title: 'Other Changes'
+    labels: []
 
 template: |
   ## Changelog for v$RESOLVED_VERSION
