@@ -6,23 +6,24 @@ template: |
 
   $CHANGES
 
+
 changelog:
   exclude:
     labels:
-      - ignore-for-release
+      - "ignore for release"
 
   categories:
-    - title: 🚀 New Features
+    - title: "🚀 New Features"
       labels:
         - enhancement
 
-    - title: 🐛 Bug Fixes
+    - title: "🐛 Bug Fixes"
       labels:
         - bug
 
-    - title: 📚 Documentation
+    - title: "📚 Documentation"
       labels:
         - documentation
 
-    - title: Other Changes
+    - title: "Other Changes"
       labels: []
