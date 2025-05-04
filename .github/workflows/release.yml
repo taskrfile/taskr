@@ -79,7 +79,7 @@ jobs:
       - name: Upload release assets
         run: |
           gh release upload ${{ github.event.inputs.version }} \
-            "artifacts/binaries-linux-latest/taskr_${{ github.event.inputs.version }}_linux" \
+            "artifacts/binaries-ubuntu-latest/taskr_${{ github.event.inputs.version }}_linux" \
             "artifacts/binaries-windows-latest/taskr_${{ github.event.inputs.version }}_windows.exe" \
             "artifacts/binaries-macos-latest/taskr_${{ github.event.inputs.version }}_macos" \
             --clobber
