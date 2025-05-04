@@ -37,22 +37,20 @@ jobs:
 
       - name: Package binaries
         run: |
+          mkdir -p artifacts
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            mkdir -p artifacts/windows
-            cp bin/Release/taskr.exe artifacts/windows/
+            cp bin/Release/taskr.exe artifacts/taskr_${{ github.event.inputs.version }}_windows.exe
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
-            mkdir -p artifacts/linux
-            cp bin/taskr artifacts/linux/taskr
+            cp bin/taskr artifacts/taskr_${{ github.event.inputs.version }}_linux
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            mkdir -p artifacts/macos
-            cp bin/taskr artifacts/macos/taskr
+            cp bin/taskr artifacts/taskr_${{ github.event.inputs.version }}_macos
           fi
         shell: bash
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-binary
+          name: binaries-${{ matrix.os }}
           path: artifacts/
 
   release:
