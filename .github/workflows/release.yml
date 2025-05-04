@@ -37,13 +37,15 @@ jobs:
 
       - name: Package binaries
         run: |
-          mkdir -p artifacts
           if [[ "${{ runner.os }}" == "Windows" ]]; then
+            mkdir -p artifacts/windows
             cp bin/Release/taskr.exe artifacts/windows/
           elif [[ "${{ runner.os }}" == "Linux" ]]; then
-            cp bin/taskr artifacts/linux/
+            mkdir -p artifacts/linux
+            cp bin/taskr artifacts/linux/taskr
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            cp bin/taskr artifacts/macos/
+            mkdir -p artifacts/macos
+            cp bin/taskr artifacts/macos/taskr
           fi
         shell: bash
 
