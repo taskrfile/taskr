@@ -205,6 +205,10 @@ private:
 	}
 
 	void set_env_var(const std::string& key, const std::string& value) {
-		setenv(key.c_str(), value.c_str(), 1);
+		#ifdef _WIN32
+		_putenv_s("MY_VAR", "value");
+		#else
+		setenv("MY_VAR", "value", 1);
+		#endif
 	}
 };
