@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskr - Command Line Runner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-industrial {
+            background-color: #2d3748;
+        }
+        .text-industrial-primary {
+            color: #a0aec0;
+        }
+        .text-industrial-secondary {
+            color: #718096;
+        }
+        .border-industrial {
+            border-color: #4a5568;
+        }
+        .bg-industrial-light {
+            background-color: #4a5568;
+        }
+        .hover\:bg-industrial-hover:hover {
+            background-color: #718096;
+        }
+        .focus\:ring-industrial:focus {
+            box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.5);
+        }
+
+        .taskr-terminal {
+            background-color: #242424;
+            color: #e6e6e6;
+            font-family: monospace;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            min-height: 8rem;
+            border: 1px solid #4a5568;
+        }
+        .taskr-terminal-prompt {
+            color: #68d391;
+            margin-right: 0.5rem;
+        }
+        .taskr-terminal-command {
+            color: #fff;
+        }
+        .taskr-terminal-output {
+            color: #a0aec0;
+            display: block;
+        }
+
+        .hljs {
+            display: block;
+            overflow-x: auto;
+            padding: 1em;
+            background: #2d3748;
+            color: #d1d5db;
+        }
+        .hljs-comment,
+        .hljs-quote {
+            color: #718096;
+            font-style: italic;
+        }
+        .hljs-doctag,
+        .hljs-keyword,
+        .hljs-meta,
+        .hljs-template-tag,
+        .hljs-template-variable,
+        .hljs-variable {
+            color: #e2777a;
+        }
+        .hljs-number,
+        .hljs-literal,
+        .hljs-symbol,
+        .hljs-name,
+        .hljs-attribute {
+            color: #f08d49;
+        }
+        .hljs-string,
+        .hljs-built_in,
+        .hljs-regexpr {
+            color: #b1c11d;
+        }
+        .hljs-title,
+        .hljs-section {
+            color: #81a2be;
+            font-weight: bold;
+        }
+        .hljs-type,
+        .hljs-deletion,
+        .hljs-params {
+            color: #e2777a;
+        }
+        .hljs-function {
+            color: #6699cc;
+        }
+        .hljs-addition,
+        .hljs-selector-attr,
+        .hljs-selector-class,
+        .hljs-selector-id {
+            color: #b1c11d;
+            font-weight: bold;
+        }
+        .hljs-tag,
+        .hljs-subst {
+            color: #e0f5fd;
+        }
+        .hljs-strong {
+            font-weight: bold;
+            color: #81a2be;
+        }
+        .hljs-emphasis {
+            font-style: italic;
+            color: #d1d5db;
+        }
+        .toml {
+            color: #d1d5db;
+        }
+        .toml .hljs-header {
+            color: #e0f5fd;
+            font-weight: bold;
+        }
+        .toml .hljs-string {
+            color: #b1c11d;
+        }
+        .toml .hljs-comment {
+            color: #718096;
+            font-style: italic;
+        }
+        .toml .hljs-number {
+            color: #f08d49;
+        }
+        .toml .hljs-bool {
+            color: #e2777a;
+        }
+        .toml .hljs-attr {
+            color: #81a2be;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-eighties.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body class="bg-industrial text-industrial-primary">
+    <main class="container mx-auto px-4 py-10">
+        <section class="text-center mb-12">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Command-Line Power, Simplified</h2>
+            <p class="text-xl text-industrial-secondary mb-8">
+                taskr is a command-line runner that simplifies running complex tasks.
+            </p>
+        </section>
+
+        <section id="installation" class="mb-12">
+            <h2 class="text-3xl font-semibold text-center mb-6">Installation</h2>
+            <div class="bg-industrial-light rounded-lg shadow-md p-6 border border-industrial">
+                <p class="text-industrial-primary mb-4">
+                    Installing taskr is done by downloading the binary of the latest release and placing it in a directory in your PATH.
+                </p>
+                <p class="text-industrial-primary mb-4">
+                    Check latest release <a href="https://github.com/avl-systems/taskr/releases/latest" class="text-blue-400" target="_blank">here</a>.
+                </p>
+            </div>
+        </section>
+
+        <section id="documentation" class="mb-12">
+            <h2 class="text-3xl font-semibold text-center mb-6">Help</h2>
+            <div class="bg-industrial-light rounded-lg shadow-md p-6 border border-industrial">
+                <p class="text-industrial-secondary mb-4">
+                    Here's a quick example of a <code>taskr.toml</code> file:
+                </p>
+                <div class="taskr-terminal">
+                  <span class="taskr-terminal-prompt">$</span><span class="taskr-terminal-command">taskr -h</span>
+                  <span class="taskr-terminal-output">Usage:</span>
+                  <span class="taskr-terminal-output">&nbsp;&nbsp;taskr &lt;task_name&gt;</span>
+                  <span class="taskr-terminal-output">Options:</span>
+                  <span class="taskr-terminal-output">&nbsp;&nbsp;-h, --help&nbsp;&nbsp;&nbsp;&nbsp;Show this help message and exit</span>
+                  <span class="taskr-terminal-output">&nbsp;&nbsp;-l, --list&nbsp;&nbsp;&nbsp;&nbsp;List the available tasks</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="documentation" class="mb-12">
+            <h2 class="text-3xl font-semibold text-center mb-6">Task Definition</h2>
+            <div class="bg-industrial-light rounded-lg shadow-md p-6 border border-industrial">
+                <p class="text-industrial-secondary mb-4">
+                    Here's a quick example of a <code>taskr.toml</code> file:
+                </p>
+                <pre><code class="language-toml taskr-terminal">[build]
+command = "make -C build/"
+description = "build the project"
+
+[install]
+command = "sudo ln -f bin/taskr /usr/bin/taskr"
+dependencies = ["build"]
+description = "link the taskr binary to /usr/bin/taskr"</code></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-industrial-light py-4 border-t border-industrial text-center">
+        <p class="text-industrial-secondary">
+            &copy; 2025 Taskr.  All rights reserved.
+        </p>
+    </footer>
+</body>
+</html>
