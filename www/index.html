@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Taskr - Command Line Runner</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-eighties.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
+        <link rel="icon" type="image/png" href="command-line.png" />
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-800 text-gray-300">
+        <main class="container mx-auto px-4 py-10">
+        <section class="text-center mb-12">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">Command-Line Power, Simplified</h2>
+            <p class="text-xl text-gray-400 mb-8">taskr is a command-line runner that simplifies running complex tasks.</p>
+            <img class="mx-auto" alt="GitHub Release" src="https://img.shields.io/github/v/release/arne-vl/taskr?color=68d391">
+        </section>
+
+        <section id="installation" class="mb-12">
+            <h2 class="text-3xl font-semibold text-center mb-6">Installation</h2>
+            <div class="bg-gray-700 rounded-xl shadow-md p-6 border border-gray-600">
+                <p class="mb-4">Installing taskr is done by downloading the binary of the latest release and placing it in a directory in your PATH.</p>
+                <p class="mb-4">
+                    Check the latest release
+                    <a href="https://github.com/arne-vl/taskr/releases/latest" target="_blank" class="text-blue-400 underline">here</a>.
+                </p>
+            </div>
+        </section>
+
+        <section id="help" class="mb-12">
+            <h2 class="text-3xl font-semibold text-center mb-6">Help</h2>
+            <div class="bg-gray-700 rounded-xl shadow-md p-6 border border-gray-600">
+                <div class="bg-gray-900 text-gray-100 font-mono p-4 rounded-lg overflow-x-auto border border-gray-600 min-h-[8rem]">
+                    <span class="text-green-400 mr-2">$</span><span class="text-white">taskr -h</span>
+                    <span class="block text-gray-400">Usage:</span>
+                    <span class="block text-gray-400">&nbsp;&nbsp;taskr &lt;task_name&gt;</span>
+                    <span class="block text-gray-400">Options:</span>
+                    <span class="block text-gray-400">&nbsp;&nbsp;-h, --help&nbsp;&nbsp;&nbsp;&nbsp;Show this help message and exit</span>
+                    <span class="block text-gray-400">&nbsp;&nbsp;-l, --list&nbsp;&nbsp;&nbsp;&nbsp;List the available tasks</span>
+                </div>
+            </div>
+        </section>
+
+            <section id="definition" class="mb-12">
+                <h2 class="text-3xl font-semibold text-center mb-6">Task Definition</h2>
+                <div class="bg-gray-700 rounded-xl shadow-md p-6 border border-gray-600">
+                    <p class="text-gray-400 mb-4">Here's a quick example of a <code>taskr.toml</code> file:</p>
+                    <div class="bg-gray-900 text-gray-100 font-mono p-4 rounded-lg overflow-x-auto border border-gray-600 min-h-[8rem] text-sm">
+                        <!-- [build] -->
+                        <div><span class="text-white">[</span><span class="text-blue-400">build</span><span class="text-white">]</span></div>
+                        <div>
+                            <span class="text-purple-400">description</span><span class="text-white"> = </span>
+                            <span class="text-green-400">"build the project"</span>
+                        </div>
+                        <div>
+                            <span class="text-purple-400">command</span><span class="text-white"> = </span>
+                            <span class="text-green-400">"make -C build"</span>
+                        </div>
+
+                        <br/>
+
+                        <!-- [install] -->
+                        <div><span class="text-white">[</span><span class="text-blue-400">install</span><span class="text-white">]</span></div>
+                        <div>
+                            <span class="text-purple-400">command</span><span class="text-white"> = </span>
+                            <span class="text-green-400">"sudo ln -f bin/taskr /usr/bin/taskr"</span>
+                        </div>
+                        <div>
+                            <span class="text-purple-400">dependencies</span><span class="text-white"> = [</span><span class="text-green-400">"build"</span><span class="text-white">]</span>
+                        </div>
+                        <div>
+                            <span class="text-purple-400">description</span><span class="text-white"> = </span>
+                            <span class="text-green-400">"link the taskr binary to /usr/bin/taskr"</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-gray-700 py-4 border-t border-gray-600 text-center">
+            <p class="text-gray-400">&copy; 2025 Taskr. All rights reserved.</p>
+        </footer>
+    </body>
+</html>
