@@ -77,6 +77,7 @@ void execute_task(const string &task_name, const vector<Task>& tasks) {
 	for (const string &resolved_task : resolved_tasks) {
 		for (const Task &task : tasks) {
 			if (task.name == resolved_task) {
+				cout << "[ ----- Executing: " << task.name << " ----- ]" << endl;
 				system(task.command.c_str());
 			}
 		}
