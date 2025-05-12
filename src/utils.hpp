@@ -13,17 +13,17 @@ enum LogLevel {
 };
 
 inline void log(const std::string& message, LogLevel level = INFO) {
-  switch (level) {
-    case INFO:
-      std::cout << "taskr: INFO: " << message << std::endl;
-      break;
-    case WARNING:
-      std::cout << "taskr: WARNING: " << message << std::endl;
-      break;
-    case ERROR:
-      std::cerr << "taskr: ERROR: " << message << std::endl;
-      break;
-  }
+    switch (level) {
+        case INFO:
+            std::cout << "taskr: INFO: " << message << std::endl;
+            break;
+        case WARNING:
+            std::cout << "taskr: WARNING: " << message << std::endl;
+            break;
+        case ERROR:
+            std::cerr << "taskr: ERROR: " << message << std::endl;
+            break;
+    }
 }
 
 inline std::string trim(const std::string& str) {
@@ -73,9 +73,9 @@ inline std::string trim_brackets(const std::string& str) {
 }
 
 inline bool contains_space(const std::string& str) {
-	for (char c : str) {
-		if (std::isspace(c)) return 1;
-	}
+    for (char c : str) {
+        if (std::isspace(c)) return 1;
+    }
     return 0;
 }
 
