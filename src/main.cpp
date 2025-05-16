@@ -1,48 +1,49 @@
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iomanip>
 
-#include "utils.hpp"
 #include "parser.hpp"
+#include "utils.hpp"
 
 using std::cout;
 using std::endl;
-using std::string;
-using std::vector;
-using std::system;
 using std::find;
-using std::setw;
 using std::left;
 using std::max;
+using std::setw;
+using std::string;
+using std::system;
+using std::vector;
 
 void show_help() {
     cout << "Usage:\n"
-    << "  taskr <task_name>\n\n"
-    << "Options:\n"
-    << "  -h, --help      Show this help message and exit\n"
-    << "  -l, --list      List the available tasks\n";
+         << "  taskr <task_name>\n\n"
+         << "Options:\n"
+         << "  -h, --help      Show this help message and exit\n"
+         << "  -l, --list      List the available tasks\n";
 }
 
-void show_tasks(const vector<Task>& tasks) {
+void show_tasks(const vector<Task> &tasks) {
     size_t name_width = 0;
-    for (const Task& task : tasks) {
+    for (const Task &task : tasks) {
         name_width = max(name_width, task.name.length());
     }
 
     cout << "List of available tasks:\n";
     cout << left;
 
-    for (const Task& task : tasks) {
+    for (const Task &task : tasks) {
         cout << "  - " << setw(name_width) << task.name;
-    if (!task.description.empty()) {
-        cout << " --> " << task.description;
+        if (!task.description.empty()) {
+            cout << " --> " << task.description;
         }
         cout << endl;
     }
 }
 
-vector<string> resolve_dependencies(const string &task_name, const vector<Task>& tasks) {
+vector<string> resolve_dependencies(const string &task_name,
+                                    const vector<Task> &tasks) {
     vector<string> resolved_tasks;
     vector<string> visited;
     vector<string> stack;
@@ -51,18 +52,19 @@ vector<string> resolve_dependencies(const string &task_name, const vector<Task>&
         string current_task = stack.back();
         stack.pop_back();
 
-        if (find(visited.begin(), visited.end(), current_task) != visited.end()) {
+        if (find(visited.begin(), visited.end(), current_task) !=
+            visited.end()) {
             continue;
         }
 
         visited.push_back(current_task);
 
         for (const Task &task : tasks) {
-        if (task.name == current_task) {
-            for (const string &dependency : task.dependencies) {
-                stack.push_back(dependency);
-            }
-            break;
+            if (task.name == current_task) {
+                for (const string &dependency : task.dependencies) {
+                    stack.push_back(dependency);
+                }
+                break;
             }
         }
 
@@ -72,12 +74,13 @@ vector<string> resolve_dependencies(const string &task_name, const vector<Task>&
     return resolved_tasks;
 }
 
-void execute_task(const string &task_name, const vector<Task>& tasks) {
+void execute_task(const string &task_name, const vector<Task> &tasks) {
     vector<string> resolved_tasks = resolve_dependencies(task_name, tasks);
     for (const string &resolved_task : resolved_tasks) {
         for (const Task &task : tasks) {
             if (task.name == resolved_task) {
-                cout << "[ ----- Executing: " << task.name << " ----- ]" << endl;
+                cout << "[ ----- Executing: " << task.name << " ----- ]"
+                     << endl;
                 system(task.command.c_str());
             }
         }
@@ -85,7 +88,7 @@ void execute_task(const string &task_name, const vector<Task>& tasks) {
 }
 
 int main(int argc, char *argv[]) {
-    if(argc != 2) {
+    if (argc != 2) {
         log("Incorrect amount of arguments", ERROR);
         exit(1);
     }
