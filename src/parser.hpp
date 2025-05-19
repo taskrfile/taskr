@@ -37,17 +37,13 @@ class Parser {
             bool is_block_line = has_brackets(line);
 
             if (tasks.size() == 0 && !is_block_line) {
-                log("Invalid taskr.toml file format: line " +
-                        std::to_string((i + 1)),
-                    ERROR);
+                log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
                 exit(1);
             }
 
             if (is_block_line) {
                 if (contains_space(line)) {
-                    log("Invalid taskr.toml file format: line " +
-                            std::to_string((i + 1)),
-                        ERROR);
+                    log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
                     exit(1);
                 }
 
@@ -66,8 +62,7 @@ class Parser {
             }
 
             if (line.find("=") != std::string::npos) {
-                std::pair<std::string, std::string> kv =
-                    parse_kv_line(line, "taskr.toml", i + 1);
+                std::pair<std::string, std::string> kv = parse_kv_line(line, "taskr.toml", i + 1);
                 if (kv.first.empty())
                     continue;
 
@@ -77,33 +72,25 @@ class Parser {
                     if (task.command.empty()) {
                         task.command = kv.second;
                     } else {
-                        log("Task " + task.name + " has multiple command keys",
-                            ERROR);
+                        log("Task " + task.name + " has multiple command keys", ERROR);
                         exit(1);
                     }
                 } else if (kv.first == "description") {
                     if (task.description.empty()) {
                         task.description = kv.second;
                     } else {
-                        log("Task " + task.name +
-                                " has multiple description keys",
-                            ERROR);
+                        log("Task " + task.name + " has multiple description keys", ERROR);
                         exit(1);
                     }
                 } else if (kv.first == "dependencies") {
                     if (task.dependencies.empty()) {
-                        task.dependencies =
-                            parse_dependencies(kv.second, tasks);
+                        task.dependencies = parse_dependencies(kv.second, tasks);
                     } else {
-                        log("Task " + task.name +
-                                " has multiple dependencies keys",
-                            ERROR);
+                        log("Task " + task.name + " has multiple dependencies keys", ERROR);
                         exit(1);
                     }
                 } else {
-                    log("Invalid key found in taskr.toml: line: " +
-                            std::to_string(i + 1),
-                        ERROR);
+                    log("Invalid key found in taskr.toml: line: " + std::to_string(i + 1), ERROR);
                     exit(1);
                 }
             }
@@ -123,8 +110,7 @@ class Parser {
             if (line.empty())
                 continue;
 
-            std::pair<std::string, std::string> kv =
-                parse_kv_line(line, ".env", i + 1);
+            std::pair<std::string, std::string> kv = parse_kv_line(line, ".env", i + 1);
             if (!kv.first.empty()) {
                 set_env_var(kv.first, kv.second);
             }
@@ -132,9 +118,7 @@ class Parser {
     }
 
   private:
-    bool file_exists(std::string filename) {
-        return std::filesystem::exists(filename);
-    }
+    bool file_exists(std::string filename) { return std::filesystem::exists(filename); }
 
     std::vector<std::string> read_file(std::string filename) {
         std::vector<std::string> lines;
@@ -156,9 +140,7 @@ class Parser {
         return lines;
     }
 
-    std::pair<std::string, std::string>
-    parse_kv_line(const std::string &line, const std::string &filename,
-                  size_t line_number) {
+    std::pair<std::string, std::string> parse_kv_line(const std::string &line, const std::string &filename, size_t line_number) {
         size_t eq_pos = line.find("=");
         if (eq_pos == std::string::npos)
             return {"", ""};
@@ -169,30 +151,30 @@ class Parser {
         bool quoted = has_quotes(value);
 
         if (filename == "taskr.toml" && !quoted && key != "dependencies") {
-            log("Missing quotes in taskr.toml: line " +
-                    std::to_string(line_number),
-                ERROR);
+            log("Missing quotes in taskr.toml: line " + std::to_string(line_number), ERROR);
             exit(1);
         }
         bool brackets = has_brackets(value);
         std::string trimmed_value = trim_quotes(value);
 
-        trimmed_value.erase(
-            std::remove(trimmed_value.begin(), trimmed_value.end(), '\\'),
-            trimmed_value.end());
+	try {
+	    trimmed_value = unescape(trimmed_value);
+	} catch (const std::invalid_argument& e) {
+	    log("Invalid escape in " + filename + ": line " + std::to_string(line_number), ERROR);
+	    exit(1);
+	}
+
+        trimmed_value.erase(std::remove(trimmed_value.begin(), trimmed_value.end(), '\\'), trimmed_value.end());
 
         if (!quoted && !brackets && contains_space(trimmed_value)) {
-            log("Spaces found without using quotes in " + filename + ": line " +
-                    std::to_string(line_number),
-                ERROR);
+            log("Spaces found without using quotes in " + filename + ": line " + std::to_string(line_number), ERROR);
             exit(1);
         }
 
         return {key, trimmed_value};
     }
 
-    std::vector<std::string> parse_dependencies(const std::string &line,
-                                                std::vector<Task> &tasks) {
+    std::vector<std::string> parse_dependencies(const std::string &line, std::vector<Task> &tasks) {
         std::vector<std::string> dependencies;
         std::string trimmed = trim_brackets(line);
 
@@ -207,8 +189,7 @@ class Parser {
             if (dep.empty())
                 continue;
 
-            if (std::find(dependencies.begin(), dependencies.end(), dep) !=
-                dependencies.end()) {
+            if (std::find(dependencies.begin(), dependencies.end(), dep) != dependencies.end()) {
                 log("Duplicate dependency found: " + dep, ERROR);
                 exit(1);
             }
@@ -216,15 +197,12 @@ class Parser {
             if (tasks.size() > 0) {
                 Task &task = tasks.back();
                 if (task.name == dep) {
-                    log("Task " + task.name + " cannot depend on itself",
-                        ERROR);
+                    log("Task " + task.name + " cannot depend on itself", ERROR);
                     exit(1);
                 }
             }
 
-            if (std::none_of(
-                    tasks.begin(), tasks.end(),
-                    [&dep](const Task &task) { return task.name == dep; })) {
+            if (std::none_of(tasks.begin(), tasks.end(), [&dep](const Task &task) { return task.name == dep; })) {
                 log("Dependency " + dep + " not found", ERROR);
                 exit(1);
             }
@@ -243,3 +221,4 @@ class Parser {
 #endif
     }
 };
+
