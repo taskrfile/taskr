@@ -42,8 +42,7 @@ void show_tasks(const vector<Task> &tasks) {
     }
 }
 
-vector<string> resolve_dependencies(const string &task_name,
-                                    const vector<Task> &tasks) {
+vector<string> resolve_dependencies(const string &task_name, const vector<Task> &tasks) {
     vector<string> resolved_tasks;
     vector<string> visited;
     vector<string> stack;
@@ -52,8 +51,7 @@ vector<string> resolve_dependencies(const string &task_name,
         string current_task = stack.back();
         stack.pop_back();
 
-        if (find(visited.begin(), visited.end(), current_task) !=
-            visited.end()) {
+        if (find(visited.begin(), visited.end(), current_task) != visited.end()) {
             continue;
         }
 
@@ -79,8 +77,7 @@ void execute_task(const string &task_name, const vector<Task> &tasks) {
     for (const string &resolved_task : resolved_tasks) {
         for (const Task &task : tasks) {
             if (task.name == resolved_task) {
-                cout << "[ ----- Executing: " << task.name << " ----- ]"
-                     << endl;
+                cout << "[ ----- Executing: " << task.name << " ----- ]" << endl;
                 system(task.command.c_str());
             }
         }
@@ -126,3 +123,4 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 }
+

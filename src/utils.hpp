@@ -3,6 +3,7 @@
 #include <cctype>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -38,10 +39,7 @@ inline std::string trim(const std::string &str) {
     return std::string(start_it, end_it + 1);
 }
 
-inline bool has_quotes(const std::string &str) {
-    return (str.front() == '"' && str.back() == '"') ||
-           (str.front() == '\'' && str.back() == '\'');
-}
+inline bool has_quotes(const std::string &str) { return (str.front() == '"' && str.back() == '"') || (str.front() == '\'' && str.back() == '\''); }
 
 inline std::string trim_quotes(const std::string &str) {
     if (str.size() > 1) {
@@ -54,9 +52,7 @@ inline std::string trim_quotes(const std::string &str) {
     return str;
 }
 
-inline bool has_brackets(const std::string &str) {
-    return (str.front() == '[' && str.back() == ']');
-}
+inline bool has_brackets(const std::string &str) { return (str.front() == '[' && str.back() == ']'); }
 
 inline std::string trim_brackets(const std::string &str) {
     if (str.size() > 1) {
@@ -86,3 +82,44 @@ inline std::vector<std::string> split(const std::string &str, char delimiter) {
     }
     return tokens;
 }
+
+inline std::string unescape(const std::string &str) {
+    std::string result;
+    bool escape = false;
+
+    for (char c : str) {
+        if (escape) {
+            switch (c) {
+            case 'n':
+                result += '\n';
+                break;
+            case 't':
+                result += '\t';
+                break;
+            case '\\':
+                result += '\\';
+                break;
+            case '"':
+                result += '"';
+                break;
+            default:
+                result += c;
+                break;
+            }
+            escape = false;
+        } else {
+            if (c == '\\') {
+                escape = true;
+            } else {
+                result += c;
+            }
+        }
+    }
+
+    if (escape) {
+        throw std::invalid_argument("Dangling escape character in value.");
+    }
+
+    return result;
+}
+
