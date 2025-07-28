@@ -1,0 +1,9 @@
+task build:
+  run   = make -C build
+  desc  = builds taskr
+  alias = b
+
+task install:
+  run   = sudo make -C build install
+  desc  = installs the taskr binary
+  alias = i

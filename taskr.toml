@@ -1,8 +1,0 @@
-[build]
-description = "build the project"
-command = "make -C build"
-
-[install]
-command = "sudo ln -f bin/taskr /usr/bin/taskr"
-dependencies = ["build"]
-description = "link the taskr binary to /usr/bin/taskr"
