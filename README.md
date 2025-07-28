@@ -6,6 +6,13 @@ It also supports loading environment variables from defined environment files.
 
 Inspired by [just](https://github.com/casey/just).
 
+## Installing
+```
+$ mkdir build && cd build
+$ cmake ..
+$ sudo make install
+```
+
 ## CLI
 ```
 $ taskr -h
