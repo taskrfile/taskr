@@ -1,224 +1,271 @@
 #pragma once
 
-#include <algorithm>
-#include <cstdlib>
-#include <filesystem>
+#include "config.h"
+#include "errors.hpp"
+#include "util.hpp"
 #include <fstream>
+#include <regex>
+#include <stdexcept>
 #include <string>
-#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
-#include "utils.hpp"
+enum TaskrParseState { START, IN_TASK, IN_ENV };
 
-struct Task {
-    std::string name;
-    std::string command;
-
-    std::string description;
-    std::vector<std::string> dependencies;
-};
-
-class Parser {
+class TaskrParser {
   public:
-    std::vector<Task> load_tasks() {
-        if (!file_exists("taskr.toml")) {
-            log("No taskr.toml file found.", ERROR);
-            exit(1);
+    Config parse_file(const std::string &filename) {
+        Config config;
+
+        std::ifstream file(filename);
+
+        if (!file.is_open()) {
+            throw std::runtime_error("Could not open file: " + filename);
         }
 
-        std::vector<Task> tasks;
+        std::string line;
+        int line_number = 0;
 
-        std::vector<std::string> lines = read_file("taskr.toml");
+        while (std::getline(file, line)) {
+            ++line_number;
 
-        for (size_t i = 0; i < lines.size(); ++i) {
-            std::string line = lines[i];
-            if (line.empty())
+            if (is_comment(line) || line.empty()) {
                 continue;
-
-            bool is_block_line = has_brackets(line);
-
-            if (tasks.size() == 0 && !is_block_line) {
-                log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
-                exit(1);
             }
 
-            if (is_block_line) {
-                if (contains_space(line)) {
-                    log("Invalid taskr.toml file format: line " + std::to_string((i + 1)), ERROR);
-                    exit(1);
+            line = strip_inline_comment(line);
+
+            std::smatch match;
+
+            if (std::regex_match(line, match, default_env_header_regex)) {
+                if (state == IN_TASK && !currentTask.name.empty()) {
+                    validate_task(currentTask);
+                    config.tasks[currentTask.name] = currentTask;
+                    currentTask = Task{};
+                } else if (state == IN_ENV && !currentEnv.name.empty()) {
+                    validate_env(currentEnv);
+                    config.environments[currentEnv.name] = currentEnv;
+                    currentEnv = Environment{};
                 }
 
-                if (tasks.size() > 0 && tasks.back().command.empty()) {
-                    log("Task " + tasks.back().name + " has no command", ERROR);
-                    exit(1);
+                if (config.hasDefaultEnv) {
+                    throw ParseError("More than 1 default environment found");
                 }
+                config.hasDefaultEnv = true;
+                state = IN_ENV;
 
-                Task task;
-                task.name = trim_brackets(line);
-                task.command = "";
-                task.description = "";
-                task.dependencies.clear();
+                currentEnv = Environment{};
+                currentEnv.name = match[2];
+                currentEnv.isDefault = true;
+                currentBlockName = currentEnv.name;
 
-                tasks.push_back(task);
-            }
-
-            if (line.find("=") != std::string::npos) {
-                std::pair<std::string, std::string> kv = parse_kv_line(line, "taskr.toml", i + 1);
-                if (kv.first.empty())
-                    continue;
-
-                Task &task = tasks.back();
-
-                if (kv.first == "command") {
-                    if (task.command.empty()) {
-                        task.command = kv.second;
-                    } else {
-                        log("Task " + task.name + " has multiple command keys", ERROR);
-                        exit(1);
-                    }
-                } else if (kv.first == "description") {
-                    if (task.description.empty()) {
-                        task.description = kv.second;
-                    } else {
-                        log("Task " + task.name + " has multiple description keys", ERROR);
-                        exit(1);
-                    }
-                } else if (kv.first == "dependencies") {
-                    if (task.dependencies.empty()) {
-                        task.dependencies = parse_dependencies(kv.second, tasks);
-                    } else {
-                        log("Task " + task.name + " has multiple dependencies keys", ERROR);
-                        exit(1);
-                    }
-                } else {
-                    log("Invalid key found in taskr.toml: line: " + std::to_string(i + 1), ERROR);
-                    exit(1);
-                }
-            }
-        }
-
-        return tasks;
-    }
-
-    void load_env() {
-        if (!file_exists(".env"))
-            return;
-
-        std::vector<std::string> lines = read_file(".env");
-
-        for (size_t i = 0; i < lines.size(); ++i) {
-            std::string line = lines[i];
-            if (line.empty())
                 continue;
-
-            std::pair<std::string, std::string> kv = parse_kv_line(line, ".env", i + 1);
-            if (!kv.first.empty()) {
-                set_env_var(kv.first, kv.second);
             }
+
+            if (std::regex_match(line, match, env_header_regex)) {
+                if (state == IN_TASK && !currentTask.name.empty()) {
+                    validate_task(currentTask);
+                    config.tasks[currentTask.name] = currentTask;
+                    currentTask = Task{};
+                } else if (state == IN_ENV && !currentEnv.name.empty()) {
+                    validate_env(currentEnv);
+                    config.environments[currentEnv.name] = currentEnv;
+                    currentEnv = Environment{};
+                }
+
+                state = IN_ENV;
+
+                currentEnv = Environment{};
+                currentEnv.name = match[2];
+                currentBlockName = currentEnv.name;
+
+                continue;
+            }
+
+            if (std::regex_match(line, match, task_header_regex)) {
+                if (state == IN_TASK && !currentTask.name.empty()) {
+                    validate_task(currentTask);
+                    config.tasks[currentTask.name] = currentTask;
+                    currentTask = Task{};
+                } else if (state == IN_ENV && !currentEnv.name.empty()) {
+                    validate_env(currentEnv);
+                    config.environments[currentEnv.name] = currentEnv;
+                    currentEnv = Environment{};
+                }
+
+                state = IN_TASK;
+
+                currentTask = Task{};
+                currentTask.name = match[1];
+                currentBlockName = currentTask.name;
+
+                continue;
+            }
+
+            if (state == START) {
+                throw ParseError("No block headers found");
+            }
+
+            handle_kv_line(line);
         }
-    }
+
+        if (state == IN_TASK && !currentTask.name.empty()) {
+            validate_task(currentTask);
+            config.tasks[currentTask.name] = currentTask;
+        }
+
+        if (state == IN_ENV && !currentEnv.name.empty()) {
+            validate_env(currentEnv);
+            config.environments[currentEnv.name] = currentEnv;
+        }
+
+        return config;
+    };
+
+    std::unordered_set<std::string> get_task_names_and_aliases() { return definedTaskNames; };
 
   private:
-    bool file_exists(std::string filename) { return std::filesystem::exists(filename); }
+    TaskrParseState state = START;
+    Task currentTask;
+    Environment currentEnv;
+    std::string currentBlockName;
 
-    std::vector<std::string> read_file(std::string filename) {
-        std::vector<std::string> lines;
-        std::ifstream input_file(filename);
+    std::unordered_set<std::string> definedTaskNames;
+    std::unordered_set<std::string> definedEnvNames;
+
+    std::regex comment_regex{R"(\s*//.*)"};
+
+    std::regex task_header_regex{R"(task\s+([a-zA-Z_][\w\-]*)\s*:\s*(.*))"};
+    std::regex task_kv_regex{R"(^(  )(run|desc|alias|needs)\s*=\s*(.+))"};
+
+    std::regex env_header_regex{R"(\s*(env)\s+([a-zA-Z_][\w\-]*)\s*:\s*(.*))"};
+    std::regex default_env_header_regex{R"(\s*(default env)\s+([a-zA-Z_][\w\-]*)\s*:\s*(.*))"};
+    std::regex env_kv_regex{R"(^(  )(file)\s*=\s*(.+))"};
+
+    bool is_comment(const std::string &line) const { return std::regex_match(line, comment_regex); }
+
+    bool is_task_header(const std::string &line) const { return std::regex_match(line, task_header_regex); }
+    bool is_env_header(const std::string &line) const { return std::regex_match(line, env_header_regex); }
+    bool is_default_env_header(const std::string &line) const { return std::regex_match(line, default_env_header_regex); }
+
+    bool is_task_kv(const std::string &line) const { return std::regex_match(line, task_kv_regex); }
+    bool is_env_kv(const std::string &line) const { return std::regex_match(line, env_kv_regex); }
+
+    void handle_kv_line(const std::string &line) {
+        std::smatch match;
+
+        if (state == IN_TASK && std::regex_match(line, match, task_kv_regex)) {
+            std::string key = match[2];
+            std::string value = trim_whitespace(match[3]);
+
+            if (key == "run")
+                currentTask.run = value;
+            else if (key == "desc")
+                currentTask.desc = value;
+            else if (key == "alias")
+                currentTask.alias = split(value, ',');
+            else if (key == "needs")
+                currentTask.needs = split(value, ',');
+        }
+
+        if (state == IN_ENV && std::regex_match(line, match, env_kv_regex)) {
+            std::string key = match[2];
+            std::string value = trim_whitespace(match[3]);
+
+            if (key == "file")
+                currentEnv.file = value;
+        }
+    };
+
+    void validate_task(const Task &task) {
+        if (task.run.empty()) {
+            throw ParseError("Task '" + task.name + "' is missing required key: run");
+        }
+
+        if (definedTaskNames.count(task.name)) {
+            throw ParseError("Task with name '" + task.name + "' is defined more than once");
+        }
+
+        definedTaskNames.insert(task.name);
+
+        for (std::string alias : task.alias) {
+            validate_alias(alias);
+        }
+
+        for (std::string dependency : task.needs) {
+            validate_dependency(dependency);
+        }
+    }
+
+    void validate_env(const Environment &env) {
+        if (env.file.empty()) {
+            throw ParseError("Environment '" + env.name + "' is missing required key: file");
+        }
+
+        if (definedEnvNames.count(env.name)) {
+            throw ParseError("Environment with name '" + env.name + "' is defined more than once");
+        }
+
+        definedTaskNames.insert(env.name);
+    }
+
+    void validate_alias(const std::string &alias) {
+        if (definedTaskNames.count(alias)) {
+            throw ParseError("Alias '" + alias + "' is used more than once");
+        }
+
+        definedTaskNames.insert(alias);
+    }
+
+    void validate_dependency(const std::string &dependency) {
+        if (!definedTaskNames.count(dependency)) {
+            throw ParseError("Dependency '" + dependency + "' could not be resolved");
+        }
+    }
+};
+
+class EnvParser {
+  public:
+    void load_env_file(const std::string &filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            throw std::runtime_error("Failed to open file: " + filename);
+        }
+
         std::string line;
 
-        while (getline(input_file, line)) {
-            std::string trimmed = trim(line);
-
-            // If empty or line comment, skip line
-            if (trimmed.empty() || trimmed[0] == '#') {
-                lines.push_back("");
+        while (std::getline(file, line)) {
+            if (line.empty() || line[0] == '#' || line[0] == ';') {
                 continue;
             }
 
-            lines.push_back(line);
-        }
-
-        return lines;
-    }
-
-    std::pair<std::string, std::string> parse_kv_line(const std::string &line, const std::string &filename, size_t line_number) {
-        size_t eq_pos = line.find("=");
-        if (eq_pos == std::string::npos)
-            return {"", ""};
-
-        std::string key = trim(line.substr(0, eq_pos));
-        std::string value = trim(line.substr(eq_pos + 1));
-
-        bool quoted = has_quotes(value);
-
-        if (filename == "taskr.toml" && !quoted && key != "dependencies") {
-            log("Missing quotes in taskr.toml: line " + std::to_string(line_number), ERROR);
-            exit(1);
-        }
-        bool brackets = has_brackets(value);
-        std::string trimmed_value = trim_quotes(value);
-
-	try {
-	    trimmed_value = unescape(trimmed_value);
-	} catch (const std::invalid_argument& e) {
-	    log("Invalid escape in " + filename + ": line " + std::to_string(line_number), ERROR);
-	    exit(1);
-	}
-
-        trimmed_value.erase(std::remove(trimmed_value.begin(), trimmed_value.end(), '\\'), trimmed_value.end());
-
-        if (!quoted && !brackets && contains_space(trimmed_value)) {
-            log("Spaces found without using quotes in " + filename + ": line " + std::to_string(line_number), ERROR);
-            exit(1);
-        }
-
-        return {key, trimmed_value};
-    }
-
-    std::vector<std::string> parse_dependencies(const std::string &line, std::vector<Task> &tasks) {
-        std::vector<std::string> dependencies;
-        std::string trimmed = trim_brackets(line);
-
-        if (trimmed.empty())
-            return dependencies;
-
-        std::vector<std::string> deps = split(trimmed, ',');
-
-        for (size_t i = 0; i < deps.size(); ++i) {
-            std::string dep = trim(trim_quotes(deps[i]));
-
-            if (dep.empty())
-                continue;
-
-            if (std::find(dependencies.begin(), dependencies.end(), dep) != dependencies.end()) {
-                log("Duplicate dependency found: " + dep, ERROR);
-                exit(1);
+            auto delimiterPos = line.find('=');
+            if (delimiterPos == std::string::npos) {
+                throw std::runtime_error("Invalid line format: " + line);
             }
 
-            if (tasks.size() > 0) {
-                Task &task = tasks.back();
-                if (task.name == dep) {
-                    log("Task " + task.name + " cannot depend on itself", ERROR);
-                    exit(1);
-                }
-            }
+            std::string key = line.substr(0, delimiterPos);
+            std::string value = line.substr(delimiterPos + 1);
 
-            if (std::none_of(tasks.begin(), tasks.end(), [&dep](const Task &task) { return task.name == dep; })) {
-                log("Dependency " + dep + " not found", ERROR);
-                exit(1);
-            }
+            key = trim_whitespace(key);
+            value = trim_whitespace(value);
 
-            dependencies.push_back(dep);
+            data[key] = value;
         }
 
-        return dependencies;
-    }
+        for (auto kv : data) {
+            set_env_var(kv.first, kv.second);
+        };
+    };
+
+  private:
+    std::unordered_map<std::string, std::string> data;
 
     void set_env_var(const std::string &key, const std::string &value) {
-#ifdef _WIN32
-        _putenv_s("MY_VAR", "value");
+#ifdef _win32
+        _putenv_s(key.c_str(), value.c_str());
 #else
-        setenv("MY_VAR", "value", 1);
+        setenv(key.c_str(), value.c_str(), 1);
 #endif
     }
 };
-
