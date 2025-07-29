@@ -25,14 +25,12 @@ Options:
   -e, --environment  Select the environment you want to use
 ```
 
-`taskr` will look for a `taskrfile` file in the current directory.
+`taskr` will look for a `taskrfile` file in the current directory. The filename is checked case-insensitive, this means that `TaskrFile` is also a valid name.
 
 > [!TIP]
 > Set `alias t=taskr` in your shell to use fewer keystrokes!
 
 ## Configuration
-`taskr` is configured in a TASKRFILE
-
 ### Formatting
 - Comments using `//`
 - Top-level blocks are defined with `env <name>:` or `task <name>:`
@@ -44,13 +42,32 @@ Options:
 
 ### Top Level Blocks
 #### ENV
-- `file`: which file's env variables need to be loaded for this specific environment
+Header:
+```taskrfile
+env <name>:
+```
+Keys:
+- `file`: which file's env variables need to be loaded for this specific environment.
+
+#### DEFAULT ENV
+The default environment is loaded when you do not explicitly provide an environment using `-e`. Using `-e` overrides this.
+Header:
+```taskrfile
+default env <name>:
+```
+Keys:
+- `file`: which file's env variables need to be loaded for this specific environment.
 
 #### TASK
-- `desc`: The description of the task
-- `run`: The command that the task will execute
-- `needs`: The dependencies of the task, dependencies will run in the order you defined
-- `alias`: list of aliases that can be used to run the task
+Header:
+```taskrfile
+task <name>:
+```
+Keys:
+- `run`: The command that the task will execute. This is the only **required** key.
+- `desc`: The description of the task.
+- `needs`: The dependencies of the task, dependencies will run in the order you defined.
+- `alias`: list of aliases that can be used to run the task.
 
 ### Example Configuration
 ```taskrfile
