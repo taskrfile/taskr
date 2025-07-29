@@ -146,7 +146,9 @@ class TaskrParser {
 
     bool is_task_header(const std::string &line) const { return std::regex_match(line, task_header_regex); }
     bool is_env_header(const std::string &line) const { return std::regex_match(line, env_header_regex); }
-    bool is_default_env_header(const std::string &line) const { return std::regex_match(line, default_env_header_regex); }
+    bool is_default_env_header(const std::string &line) const {
+        return std::regex_match(line, default_env_header_regex);
+    }
 
     bool is_task_kv(const std::string &line) const { return std::regex_match(line, task_kv_regex); }
     bool is_env_kv(const std::string &line) const { return std::regex_match(line, env_kv_regex); }
