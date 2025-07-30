@@ -1,9 +1,31 @@
+task generate:
+  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  desc  = generates build files
+  alias = g
+
+task generate_r:
+  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+  desc  = generates with release flag
+
 task build:
-  run   = make -C build
-  desc  = builds taskr
+  run   = cmake --build build -j
+  desc  = builds executable with testing
   alias = b
 
+task test:
+  run   = GTEST_COLOR=1 ctest --test-dir build --output-on-failure -j
+  desc  = runs tests
+  needs = generate, build
+  alias = t
+
 task install:
-  run   = sudo make -C build install
+  run   = sudo cmake --install build
   desc  = installs the taskr binary
+  needs = generate, build
   alias = i
+
+task install_r:
+  run   = sudo cmake --install build
+  desc  = installs the taskr release binary
+  needs = generate_r, build
+  alias = ir
