@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
         const Config config = parser.parse_file(filename);
 
         if (argc != 2 && argc != 4) {
-            throw FormatError();
+            throw ArgError();
         }
 
         if (argc == 2 && (std::string(argv[1]) == "-l" || std::string(argv[1]) == "--list")) {
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
         executor.execute(config, taskName);
 
-    } catch (const FormatError &e) {
+    } catch (const ArgError &e) {
         std::cerr << e.what() << "\n\n";
         print_help();
         return 1;

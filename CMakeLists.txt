@@ -25,6 +25,7 @@ add_executable(taskr src/main.cpp)
 if (BUILD_TESTING)
     add_executable(taskr_tests
         tests/test.cpp
+        tests/test_errors.cpp
     )
     target_link_libraries(taskr_tests gtest gtest_main)
 
