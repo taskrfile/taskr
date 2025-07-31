@@ -2,6 +2,7 @@
 #include "executor.hpp"
 #include "parser.hpp"
 #include "util.hpp"
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <unordered_set>
@@ -65,7 +66,14 @@ int main(int argc, char *argv[]) {
         std::string taskName;
         std::string envName;
 
-        const Config config = parser.parse_file(filename);
+        std::ifstream file(filename);
+        std::vector<std::string> lines;
+        std::string line;
+        while (std::getline(file, line)) {
+            lines.push_back(line);
+        }
+
+        Config config = parser.parse_lines(lines);
 
         if (argc != 2 && argc != 4) {
             throw ArgError();
@@ -82,7 +90,13 @@ int main(int argc, char *argv[]) {
             if (config.hasDefaultEnv) {
                 for (auto kv : config.environments) {
                     if (kv.second.isDefault) {
-                        envParser.load_env_file(kv.second.file);
+                        std::ifstream file(kv.second.file);
+                        std::vector<std::string> lines;
+                        std::string line;
+                        while (std::getline(file, line)) {
+                            lines.push_back(line);
+                        }
+                        envParser.load_env(lines, kv.second.file);
                     }
                 }
             }
@@ -103,7 +117,13 @@ int main(int argc, char *argv[]) {
                 throw TaskrError("No environment '" + envName + "' found in config");
             }
 
-            envParser.load_env_file(config.environments.at(envName).file);
+            std::ifstream file(config.environments.at(envName).file);
+            std::vector<std::string> lines;
+            std::string line;
+            while (std::getline(file, line)) {
+                lines.push_back(line);
+            }
+            envParser.load_env(lines, config.environments.at(envName).file);
         };
 
         std::unordered_set<std::string> definedTasksAndAliases = parser.get_task_names_and_aliases();

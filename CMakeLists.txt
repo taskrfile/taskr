@@ -26,6 +26,7 @@ if (BUILD_TESTING)
     add_executable(taskr_tests
         tests/test.cpp
         tests/test_errors.cpp
+        tests/test_parser.cpp
     )
     target_link_libraries(taskr_tests gtest gtest_main)
 
