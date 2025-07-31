@@ -27,6 +27,7 @@ if (BUILD_TESTING)
         tests/test.cpp
         tests/test_errors.cpp
         tests/test_parser.cpp
+        tests/test_util.cpp
     )
     target_link_libraries(taskr_tests gtest gtest_main)
 
