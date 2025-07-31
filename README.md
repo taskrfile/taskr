@@ -8,9 +8,9 @@ Inspired by [just](https://github.com/casey/just).
 
 ## Installing
 ```
-$ mkdir build && cd build
-$ cmake ..
-$ sudo make install
+$ cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build -j
+$ sudo cmake --install build
 ```
 
 ## CLI
