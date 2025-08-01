@@ -221,9 +221,9 @@ TEST(ParserTest, EnvFileTest) {
     lines = {"KEY=value", "# Comment", "; Another comment", "TASKRUSER = JohnDoe"};
 
     ASSERT_NO_THROW(envParser.load_env(lines, "imaginary.env"));
-    EXPECT_STREQ(std::getenv("KEY"), "value");
-    EXPECT_STREQ(std::getenv("TASKRUSER"), "JohnDoe");
-    //
+    EXPECT_EQ(get_env("KEY"), "value");
+    EXPECT_EQ(get_env("TASKRUSER"), "JohnDoe");
+
     // Invalid
     lines = {"INVALID_LINE"};
     EXPECT_THROW(envParser.load_env(lines, "imaginary.env"), ParseError);

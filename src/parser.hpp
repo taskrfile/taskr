@@ -1,5 +1,6 @@
 #pragma once
 
+#include "env_helper.hpp"
 #include "config.h"
 #include "errors.hpp"
 #include "util.hpp"
@@ -262,10 +263,6 @@ class EnvParser {
     std::unordered_map<std::string, std::string> data;
 
     void set_env_var(const std::string &key, const std::string &value) {
-#ifdef _win32
-        _putenv_s(key.c_str(), value.c_str());
-#else
-        setenv(key.c_str(), value.c_str(), 1);
-#endif
+        set_env(key.c_str(), value.c_str());
     }
 };
