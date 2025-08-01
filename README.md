@@ -12,6 +12,8 @@ $ cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build -j
 $ sudo cmake --install build
 ```
+> [!CAUTION]
+> Windows is not (yet) supported. If on Windows, use WSL.
 
 ## CLI
 ```
