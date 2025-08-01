@@ -1,4 +1,7 @@
 # Taskr
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/arne-vl/taskr/cmake-clang-gcc.yaml?branch=main&color=%23a6e3a1)
+![GitHub License](https://img.shields.io/github/license/arne-vl/taskr?color=%23fab387)
+![GitHub Repo stars](https://img.shields.io/github/stars/arne-vl/taskr?style=social)
 
 `taskr` is a simple command-line task runner written in C++.
 It allows you to define tasks in a `taskrfile` and execute them with ease.
