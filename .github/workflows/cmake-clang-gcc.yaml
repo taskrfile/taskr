@@ -2,7 +2,7 @@ name: CMake on Linux (GCC and Clang)
 
 on:
   push:
-    branches: [ "main", "feat/tests" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
