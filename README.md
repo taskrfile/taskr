@@ -94,6 +94,6 @@ task install:
 ```
 
 # Sidenote
-While I do my best to keep it functional, stable, and useful, **things can (and probably will) break from time to time**.
+While I do my best to keep this functional, stable, and useful, **things can (and probably will) break from time to time**.
 
 Please use it with caution. Contributions, bug reports, and ideas are always welcome.
