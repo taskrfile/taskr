@@ -4,7 +4,7 @@
 #include <string>
 
 #if defined(_WIN32)
-#include <winbase.h>
+#include <windows.h>
 
 std::string get_env(const char* var) {
     char* value = nullptr;
