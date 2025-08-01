@@ -2,27 +2,31 @@
 
 #include <stdexcept>
 
+// Main error class
 class TaskrError : public std::runtime_error {
   public:
-    TaskrError(const std::string &msg) : std::runtime_error("TaskrError: " + msg) {}
+    explicit TaskrError(const std::string &msg) : std::runtime_error("TaskrError: " + msg) {}
 };
 
-class ParseError : public TaskrError {
+// CLI errors
+class ArgError : public TaskrError {
   public:
-    ParseError(const std::string &msg) : TaskrError("Parse error: " + msg) {}
+    explicit ArgError() : TaskrError("Wrong command format") {}
+};
+
+// Configuration errors
+class MultiConfigError : public TaskrError {
+  public:
+    explicit MultiConfigError(const std::string &msg) : TaskrError("Multiple configurations found: " + msg) {}
 };
 
 class FileNotFoundError : public TaskrError {
   public:
-    FileNotFoundError(const std::string &msg) : TaskrError("File not found: " + msg) {}
+    explicit FileNotFoundError(const std::string &msg) : TaskrError("File not found: " + msg) {}
 };
 
-class MultiConfigError : public TaskrError {
+// Parser Errors
+class ParseError : public TaskrError {
   public:
-    MultiConfigError(const std::string &msg) : TaskrError("Multiple configurations found: " + msg) {}
-};
-
-class FormatError : public TaskrError {
-  public:
-    FormatError() : TaskrError("Wrong command format") {}
+    explicit ParseError(const std::string &msg) : TaskrError("Parse error: " + msg) {}
 };

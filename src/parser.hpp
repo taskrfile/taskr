@@ -3,31 +3,36 @@
 #include "config.h"
 #include "errors.hpp"
 #include "util.hpp"
-#include <fstream>
+#include <cstdlib>
+#include <iostream>
 #include <regex>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 enum TaskrParseState { START, IN_TASK, IN_ENV };
 
 class TaskrParser {
   public:
-    Config parse_file(const std::string &filename) {
+    Config parse_lines(const std::vector<std::string> &lines) {
+        definedTaskNames.clear();
+        definedEnvNames.clear();
+        currentTask = {};
+        currentEnv = {};
+        currentBlockName = "";
+
         Config config;
 
-        std::ifstream file(filename);
+        for (const auto &l : lines)
+            std::cout << l;
+        std::cout << std::endl;
 
-        if (!file.is_open()) {
-            throw std::runtime_error("Could not open file: " + filename);
-        }
-
-        std::string line;
         int line_number = 0;
 
-        while (std::getline(file, line)) {
+        for (const std::string &raw_line : lines) {
             ++line_number;
+            std::string line = raw_line;
 
             if (is_comment(line) || line.empty()) {
                 continue;
@@ -120,7 +125,7 @@ class TaskrParser {
         }
 
         return config;
-    };
+    }
 
     std::unordered_set<std::string> get_task_names_and_aliases() { return definedTaskNames; };
 
@@ -180,70 +185,63 @@ class TaskrParser {
     };
 
     void validate_task(const Task &task) {
-        if (task.run.empty()) {
-            throw ParseError("Task '" + task.name + "' is missing required key: run");
+        if (definedTaskNames.count(task.name)) {
+            throw ParseError("Task '" + task.name + "' is defined more than once");
         }
 
-        if (definedTaskNames.count(task.name)) {
-            throw ParseError("Task with name '" + task.name + "' is defined more than once");
+        for (const std::string &alias : task.alias) {
+            if (alias == task.name) {
+                throw ParseError("Alias '" + alias + "' cannot be the same as the task name '" + task.name + "'");
+            }
+        }
+
+        for (const std::string &alias : task.alias) {
+            if (definedTaskNames.count(alias)) {
+                throw ParseError("Alias '" + alias + "' is used more than once or is a task");
+            }
+        }
+
+        if (task.run.empty()) {
+            throw ParseError("Task '" + task.name + "' is missing required key: 'run'");
         }
 
         definedTaskNames.insert(task.name);
 
-        for (std::string alias : task.alias) {
-            validate_alias(alias);
+        for (const std::string &alias : task.alias) {
+            definedTaskNames.insert(alias);
         }
 
-        for (std::string dependency : task.needs) {
-            validate_dependency(dependency);
+        for (const std::string &dependency : task.needs) {
+            if (!definedTaskNames.count(dependency)) {
+                throw ParseError("Dependency '" + dependency + "' could not be resolved");
+            }
         }
     }
 
     void validate_env(const Environment &env) {
-        if (env.file.empty()) {
-            throw ParseError("Environment '" + env.name + "' is missing required key: file");
-        }
-
         if (definedEnvNames.count(env.name)) {
-            throw ParseError("Environment with name '" + env.name + "' is defined more than once");
+            throw ParseError("Environment '" + env.name + "' is defined more than once");
         }
 
-        definedTaskNames.insert(env.name);
-    }
-
-    void validate_alias(const std::string &alias) {
-        if (definedTaskNames.count(alias)) {
-            throw ParseError("Alias '" + alias + "' is used more than once");
+        if (env.file.empty()) {
+            throw ParseError("Environment '" + env.name + "' is missing required key: 'file'");
         }
 
-        definedTaskNames.insert(alias);
-    }
-
-    void validate_dependency(const std::string &dependency) {
-        if (!definedTaskNames.count(dependency)) {
-            throw ParseError("Dependency '" + dependency + "' could not be resolved");
-        }
+        definedEnvNames.insert(env.name);
     }
 };
 
 class EnvParser {
   public:
-    void load_env_file(const std::string &filename) {
-        std::ifstream file(filename);
-        if (!file.is_open()) {
-            throw std::runtime_error("Failed to open file: " + filename);
-        }
-
-        std::string line;
-
-        while (std::getline(file, line)) {
+    void load_env(const std::vector<std::string> &lines, const std::string &filename) {
+        for (const std::string &line : lines) {
             if (line.empty() || line[0] == '#' || line[0] == ';') {
                 continue;
             }
 
             auto delimiterPos = line.find('=');
             if (delimiterPos == std::string::npos) {
-                throw std::runtime_error("Invalid line format: " + line);
+                throw ParseError("Invalid line format in environment file: '" + filename + "': " + line);
             }
 
             std::string key = line.substr(0, delimiterPos);
@@ -263,11 +261,5 @@ class EnvParser {
   private:
     std::unordered_map<std::string, std::string> data;
 
-    void set_env_var(const std::string &key, const std::string &value) {
-#ifdef _win32
-        _putenv_s(key.c_str(), value.c_str());
-#else
-        setenv(key.c_str(), value.c_str(), 1);
-#endif
-    }
+    void set_env_var(const std::string &key, const std::string &value) { setenv(key.c_str(), value.c_str(), 1); }
 };
