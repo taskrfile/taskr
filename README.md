@@ -30,7 +30,8 @@ Options:
   -e, --environment  Select the environment you want to use
 ```
 
-`taskr` will look for a `taskrfile` file in the current directory. The filename is checked case-insensitive, this means that `TaskrFile` is also a valid name.
+`taskr` will look for a `taskrfile` file in the current directory. If it is not found in the current directory, it will look in `~/.config/taskr`.
+The filename is checked case-insensitive, this means that `TaskrFile` is also a valid name.
 
 > [!TIP]
 > Set `alias t=taskr` in your shell to use fewer keystrokes!

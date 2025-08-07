@@ -14,11 +14,11 @@ inline std::string to_lowercase(const std::string &str) {
     return result;
 }
 
-inline std::vector<std::string> find_case_insensitive_files(const std::string &target) {
+inline std::vector<std::string> find_case_insensitive_files(const std::string &target, const std::string path) {
     std::vector<std::string> matches;
     const std::string target_lower = to_lowercase(target);
 
-    for (const auto &entry : fs::directory_iterator(fs::current_path())) {
+    for (const auto &entry : fs::directory_iterator(path)) {
         if (entry.is_regular_file()) {
             std::string filename = entry.path().filename().string();
             if (to_lowercase(filename) == target_lower) {
@@ -29,11 +29,25 @@ inline std::vector<std::string> find_case_insensitive_files(const std::string &t
     return matches;
 }
 
+inline std::string get_global_config(const std::string &target) {
+    std::string homeDir = getenv("HOME");
+
+    auto matches = find_case_insensitive_files(target, homeDir + "/.config/taskr");
+
+    if (matches.empty())
+        throw FileNotFoundError("No \"" + target + "\" found.");
+
+    if (matches.size() > 1)
+        throw MultiConfigError("Multiple global files found with case-insensitive match to \"" + target + "\".");
+
+    return homeDir + "/.config/taskr/" + matches.front();
+}
+
 inline std::string check_unique_case_insensitive_match(const std::string &target) {
-    auto matches = find_case_insensitive_files(target);
+    auto matches = find_case_insensitive_files(target, fs::current_path());
 
     if (matches.empty()) {
-        throw FileNotFoundError("No \"" + target + "\" found.");
+        return get_global_config(target);
     }
 
     if (matches.size() > 1) {

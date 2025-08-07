@@ -59,6 +59,10 @@ int main(int argc, char *argv[]) {
     try {
         const std::string filename = check_unique_case_insensitive_match("taskrfile");
 
+        if (filename.find(".config/taskr") != std::string::npos) {
+            std::cout << "Taskr: Using global config" << std::endl << std::endl;
+        }
+
         TaskrParser parser;
         EnvParser envParser;
         TaskrExecutor executor;
