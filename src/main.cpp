@@ -48,6 +48,9 @@ void print_config(const Config &config) {
             }
         }
     }
+
+    if (config.tasks.empty() && config.environments.empty())
+        std::cout << "Config file is empty" << std::endl;
 }
 
 int main(int argc, char *argv[]) {

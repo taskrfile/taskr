@@ -32,7 +32,13 @@ inline std::vector<std::string> find_case_insensitive_files(const std::string &t
 inline std::string get_global_config(const std::string &target) {
     std::string homeDir = getenv("HOME");
 
-    auto matches = find_case_insensitive_files(target, homeDir + "/.config/taskr");
+    std::vector<std::string> matches;
+
+    try {
+        matches = find_case_insensitive_files(target, homeDir + "/.config/taskr");
+    } catch (std::filesystem::filesystem_error &e) {
+        throw FileNotFoundError("No \"" + target + "\" found.");
+    }
 
     if (matches.empty())
         throw FileNotFoundError("No \"" + target + "\" found.");
