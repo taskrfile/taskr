@@ -48,6 +48,9 @@ void print_config(const Config &config) {
             }
         }
     }
+
+    if (config.tasks.empty() && config.environments.empty())
+        std::cout << "Config file is empty" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -58,6 +61,10 @@ int main(int argc, char *argv[]) {
 
     try {
         const std::string filename = check_unique_case_insensitive_match("taskrfile");
+
+        if (filename.find(".config/taskr") != std::string::npos) {
+            std::cout << "Taskr: Using global config" << std::endl << std::endl;
+        }
 
         TaskrParser parser;
         EnvParser envParser;

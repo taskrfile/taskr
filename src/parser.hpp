@@ -4,7 +4,6 @@
 #include "errors.hpp"
 #include "util.hpp"
 #include <cstdlib>
-#include <iostream>
 #include <regex>
 #include <string>
 #include <unordered_map>
@@ -23,11 +22,6 @@ class TaskrParser {
         currentBlockName = "";
 
         Config config;
-
-        for (const auto &l : lines)
-            std::cout << l;
-        std::cout << std::endl;
-
         int line_number = 0;
 
         for (const std::string &raw_line : lines) {
