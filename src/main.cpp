@@ -98,6 +98,9 @@ int main(int argc, char *argv[]) {
                 for (auto kv : config.environments) {
                     if (kv.second.isDefault) {
                         std::ifstream file(kv.second.file);
+                        if (!file.good()) {
+                            throw FileNotFoundError(kv.second.file);
+                        }
                         std::vector<std::string> lines;
                         std::string line;
                         while (std::getline(file, line)) {
@@ -125,6 +128,9 @@ int main(int argc, char *argv[]) {
             }
 
             std::ifstream file(config.environments.at(envName).file);
+            if (!file.good()) {
+                throw FileNotFoundError(config.environments.at(envName).file);
+            }
             std::vector<std::string> lines;
             std::string line;
             while (std::getline(file, line)) {
