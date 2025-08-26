@@ -1,15 +1,15 @@
 task generate:
-  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-  desc  = generates build files
+  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTING=OFF
+  desc  = generates build files with testing
   alias = g
 
 task generate_r:
   run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
-  desc  = generates with release flag
+  desc  = generates with release flag and without testing
 
 task build:
   run   = cmake --build build -j
-  desc  = builds executable with testing
+  desc  = builds executable
   alias = b
 
 task test:
