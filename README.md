@@ -99,6 +99,10 @@ task install:
   alias = i
 ```
 
+## Tools
+- [Treesitter Parser](https://github.com/arne-vl/tree-sitter-taskr)
+- [Language Server](https://github.com/arne-vl/taskr-ls)
+
 # Sidenote
 While I do my best to keep this functional, stable, and useful, **things can (and probably will) break from time to time**.
 
