@@ -4,7 +4,7 @@ task generate:
   alias = g
 
 task generate_r:
-  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+  run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
   desc  = generates with release flag
 
 task build:
