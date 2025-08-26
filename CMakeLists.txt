@@ -5,15 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-# Update submodules
-include(cmake/UpdateSubmodules.cmake)
-
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR}/src)
-
-# CTest - GoogleTest
-include(CTest)
-add_subdirectory(external/googletest EXCLUDE_FROM_ALL)
 
 # Main executable
 add_executable(taskr src/main.cpp)
@@ -23,6 +16,13 @@ add_executable(taskr src/main.cpp)
 # Disable testing: cmake -B build -S . -DBUILD_TESTING=OFF
 # Enable testing: cmake -B build -S . -DBUILD_TESTING=ON
 if (BUILD_TESTING)
+    # Update submodules
+    include(cmake/UpdateSubmodules.cmake)
+    # CTest - GoogleTest
+    include(CTest)
+    add_subdirectory(external/googletest EXCLUDE_FROM_ALL)
+
+
     add_executable(taskr_tests
         tests/test.cpp
         tests/test_errors.cpp

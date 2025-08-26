@@ -1,11 +1,20 @@
+task _build_dir:
+  run   = mkdir -p build
+
+task clean:
+  run   = rm -rf build bin .cache
+  desc  = cleans directories
+
 task generate:
   run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTING=ON
   desc  = generates build files with testing
   alias = g
+  needs = clean, _build_dir
 
 task generate_r:
   run   = cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
   desc  = generates with release flag and without testing
+  needs = clean, _build_dir
 
 task build:
   run   = cmake --build build -j
@@ -20,12 +29,7 @@ task test:
 
 task install:
   run   = sudo cmake --install build
-  desc  = installs the taskr binary
-  needs = generate, build
-  alias = i
-
-task install_r:
-  run   = sudo cmake --install build
   desc  = installs the taskr release binary
   needs = generate_r, build
-  alias = ir
+  alias = i
+
