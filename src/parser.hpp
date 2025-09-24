@@ -3,7 +3,6 @@
 #include "config.h"
 #include "errors.hpp"
 #include "util.hpp"
-#include <cstdlib>
 #include <regex>
 #include <string>
 #include <unordered_map>

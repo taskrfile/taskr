@@ -2,8 +2,8 @@
 #include "executor.hpp"
 #include "parser.hpp"
 #include "util.hpp"
-#include <fstream>
 #include <format>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <unordered_set>

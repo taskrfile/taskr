@@ -3,6 +3,7 @@
 #include "config.h"
 #include "errors.hpp"
 #include <algorithm>
+#include <format>
 #include <unordered_set>
 #include <vector>
 
@@ -21,7 +22,7 @@ class TaskrExecutor {
 
         const Task *task = find_task(config, taskName);
         if (!task) {
-            throw TaskrError("Task not found: " + taskName);
+            throw TaskrError(std::format("Task not found: {}", taskName));
         }
 
         visited.insert(task->name);
