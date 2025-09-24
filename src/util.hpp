@@ -3,7 +3,7 @@
 #include "errors.hpp"
 #include <algorithm>
 #include <filesystem>
-#include <string>
+#include <sstream>
 #include <vector>
 
 namespace fs = std::filesystem;
