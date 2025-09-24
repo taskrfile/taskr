@@ -2,6 +2,7 @@
 #include "executor.hpp"
 #include "parser.hpp"
 #include "util.hpp"
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -124,7 +125,7 @@ int main(int argc, char *argv[]) {
             };
 
             if (config.environments.find(envName) == config.environments.end()) {
-                throw TaskrError("No environment '" + envName + "' found in config");
+                throw TaskrError(std::format("No environment '{}' found in config", envName));
             }
 
             std::ifstream file(config.environments.at(envName).file);
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
         auto it = std::find(definedTasksAndAliases.begin(), definedTasksAndAliases.end(), taskName);
 
         if (it == definedTasksAndAliases.end()) {
-            throw TaskrError("Task or alias '" + taskName + "' not found");
+            throw TaskrError(std::format("Task or alias '{}' not found", taskName));
         }
 
         executor.execute(config, taskName);
